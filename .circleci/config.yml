@@ -91,6 +91,8 @@ jobs:
             kubectl apply -f k8s/rollingUpdate.yml
             kubectl apply -f k8s/deployment-service.yml
             kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
+            kubectl get nodes
+            kubectl get pods
 
 workflows:
   default:
