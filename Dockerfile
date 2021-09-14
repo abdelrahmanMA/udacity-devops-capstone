@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ./src/package.json .
 COPY ./src/package-lock.json .
 
-ARG NODE_ENV
+asda
 RUN npm install
 
 COPY . .
