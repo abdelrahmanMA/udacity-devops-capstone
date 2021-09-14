@@ -1,0 +1,107 @@
+version: 2.1
+
+jobs:
+  install-dependencies:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: app dependencies
+          working_directory: ./src
+          command: npm install
+      - save_cache:
+          paths: [src/node_modules]
+          key: src-build
+
+  lint:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [src-build]
+
+      - run:
+          name: Lint app
+          working_directory: ./src
+          command: |
+            npm run lint
+
+      - run:
+          name: Install hadolint
+          command: |
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+            chmod +x /bin/hadolint
+
+      - run:
+          name: Lint Dockerfile
+          command: |
+            hadolint Dockerfile
+
+
+  scan:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [src-build]
+      - run:
+          name: scan src
+          working_directory: ./src
+          command: |
+            npm audit --audit-level=critical
+
+  build-docker:
+    working_directory: /app
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - deploy:
+          name: Push application Docker image
+          command: |
+            docker build --tag=udacity-devops-capstone .
+            docker login -u abdelrahmanma -p "$DOCKER_PASSWORD"
+            docker push "abdelrahmanma/udacity-devops-capstone"
+  deploy:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            install -m 0755 kubectl /bin/kubectl
+
+      - run:
+          name: Update Deployment
+          command: |
+            PROJECT=UdacityDevOpsCapstone
+            IMAGE="abdelrahmanma/udacity-devops-capstone"
+            aws eks --region us-west-2 update-kubeconfig --name CapstoneCluster
+            kubectl apply -f k8s/rollingUpdate.yml
+            kubectl apply -f k8s/deployment-service.yml
+            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:latest
+
+workflows:
+  default:
+    jobs:
+      - install-dependencies
+      - lint:
+          requires: [install-dependencies]
+      - scan:
+          requires: [lint]
+      - build-docker:
+          requires: [scan]
+          filters:
+           branches:
+             only: [main]
+      # - deploy:
+      #     requires: [build-docker]
+      #     filters:
+      #      branches:
+      #        only: [main]
