@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "UdacityProjectDevOpsProjectCapstone"
+  },
+  {
+    "ParameterKey": "NodeGroupName",
+    "ParameterValue": "CapstoneNodes"
+  },
+  {
+    "ParameterKey": "EKSClusterName",
+    "ParameterValue": "CapstoneCluster"
+  }
+]

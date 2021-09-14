@@ -1,0 +1,54 @@
+Description: >
+  Abdelrahman Muhammad / Udacity DevOps Capstone Kubernetes master
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+  EKSIAMRoleName:
+    Type: String
+    Description: The name of the IAM role for the EKS service to assume.
+  EKSClusterName:
+    Type: String
+    Description: The desired name of your AWS EKS Cluster.
+
+Resources:
+  EKSIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      RoleName: !Ref EKSIAMRoleName
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref EKSClusterName
+      RoleArn:
+        "Fn::GetAtt": ["EKSIAMRole", "Arn"]
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - Fn::ImportValue: !Sub "${EnvironmentName}-CP-SG"
+        SubnetIds:
+          - Fn::ImportValue: !Sub "${EnvironmentName}-PUB1-SN"
+          - Fn::ImportValue: !Sub "${EnvironmentName}-PUB2-SN"
+          - Fn::ImportValue: !Sub "${EnvironmentName}-PRI1-SN"
+          - Fn::ImportValue: !Sub "${EnvironmentName}-PRI2-SN"
+    DependsOn: [EKSIAMRole]
+
+Outputs:
+  EKSCluster:
+    Description: The EKSCluster Name
+    Value: !Ref EKSCluster
+    Export:
+      Name: !Sub "${EnvironmentName}-EKSCluster"

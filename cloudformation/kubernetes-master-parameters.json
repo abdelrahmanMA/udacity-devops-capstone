@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "EnvironmentName",
+        "ParameterValue": "UdacityProjectDevOpsProjectCapstone"
+    },
+    {
+        "ParameterKey": "EKSIAMRoleName",
+        "ParameterValue": "AMAEKSRole"
+    },
+    {
+        "ParameterKey": "EKSClusterName",
+        "ParameterValue": "CapstoneCluster"
+    }
+]
