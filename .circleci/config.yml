@@ -67,8 +67,10 @@ jobs:
             DOCKERPATH="abdelrahmanma/udacity-devops-capstone"
             docker build --tag=udacity-devops-capstone .
             docker login -u abdelrahmanma -p "$DOCKER_PASSWORD"
-            docker image tag udacity-devops-capstone $DOCKERPATH
+            docker image tag udacity-devops-capstone $DOCKERPATH:latest
             docker image push $DOCKERPATH
+            docker image tag udacity-devops-capstone $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
+            docker image push $DOCKERPATH:${CIRCLE_WORKFLOW_ID:0:7}
   deploy:
     docker:
       - image: amazon/aws-cli
@@ -88,7 +90,7 @@ jobs:
             aws eks --region us-east-1 update-kubeconfig --name CapstoneCluster
             kubectl apply -f k8s/rollingUpdate.yml
             kubectl apply -f k8s/deployment-service.yml
-            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:latest
+            kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:${CIRCLE_WORKFLOW_ID:0:7}
 
 workflows:
   default:
