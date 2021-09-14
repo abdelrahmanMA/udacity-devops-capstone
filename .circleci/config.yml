@@ -83,9 +83,9 @@ jobs:
       - run:
           name: Update Deployment
           command: |
-            PROJECT=UdacityDevOpsCapstone
+            PROJECT=udacity-devops-capstone
             IMAGE="abdelrahmanma/udacity-devops-capstone"
-            aws eks --region us-west-2 update-kubeconfig --name CapstoneCluster
+            aws eks --region us-east-1 update-kubeconfig --name CapstoneCluster
             kubectl apply -f k8s/rollingUpdate.yml
             kubectl apply -f k8s/deployment-service.yml
             kubectl set image deployments/$PROJECT $PROJECT=$IMAGE:latest
@@ -103,8 +103,8 @@ workflows:
           filters:
            branches:
              only: [main]
-      # - deploy:
-      #     requires: [build-docker]
-      #     filters:
-      #      branches:
-      #        only: [main]
+      - deploy:
+          requires: [build-docker]
+          filters:
+           branches:
+             only: [main]
