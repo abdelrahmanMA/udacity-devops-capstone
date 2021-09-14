@@ -64,9 +64,11 @@ jobs:
       - deploy:
           name: Push application Docker image
           command: |
+            DOCKERPATH="abdelrahmanma/udacity-devops-capstone"
             docker build --tag=udacity-devops-capstone .
             docker login -u abdelrahmanma -p "$DOCKER_PASSWORD"
-            docker push "abdelrahmanma/udacity-devops-capstone"
+            docker image tag udacity-devops-capstone $DOCKERPATH
+            docker image push $DOCKERPATH
   deploy:
     docker:
       - image: amazon/aws-cli
