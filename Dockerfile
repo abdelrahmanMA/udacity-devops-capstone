@@ -7,7 +7,7 @@ COPY ./src/package-lock.json .
 
 RUN npm install
 
-COPY . .
+COPY ./src .
 
 EXPOSE 3000
 
