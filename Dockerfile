@@ -2,8 +2,8 @@ FROM node:14.17.4-alpine
 
 WORKDIR /app
 
-COPY ./package.json .
-COPY ./package-lock.json .
+COPY ./src/package.json .
+COPY ./src/package-lock.json .
 
 ARG NODE_ENV
 RUN npm install
