@@ -1,7 +1,7 @@
 [
     {
         "ParameterKey": "EnvironmentName",
-        "ParameterValue": "UdacityProjectDevOpsProjectCapstone"
+        "ParameterValue": "UdacityDevOpsCapstone"
     },
     {
         "ParameterKey": "EKSIAMRoleName",
